@@ -1,5 +1,13 @@
 <template>
-  <div id="map"></div>
+  <div id="map">
+    <div id="thumbnail">
+      <ul @click="showMap">
+        <li id="1"><img src="../image/vec_c.png" alt="矢量缩略图"></li>
+        <li id="2"><img src="../image/img_c.png" alt="影像缩略图"></li>
+        <li id="3"><img src="../image/ter_c.png" alt="地形缩略图"></li>
+      </ul>
+    </div>
+  </div>
 </template>
 <script>
 import Map from 'ol/Map.js';
@@ -21,7 +29,12 @@ export default {
     }
   },
   mounted() {
-    this.createMap()
+    console.log("触发了mounted");
+    // this.createMap()
+  },
+  updated() {
+    console.log('触发了updated');
+    // this.createMap()
   },
   methods: {
     createMap() {
@@ -89,6 +102,28 @@ export default {
           zoom: 3
         })
       });
+    },
+    showMap(e) {
+      // console.log(e.target.parentNode);
+      var li = e.target.parentNode;
+      switch (li.id) {
+        case '1':
+          this.urlLayer = 'vec';
+          this.urlMatrixSet = 'c';
+          this.cvaLayer = 'cva';
+          break;
+        case '2':
+          this.urlLayer = 'img';
+          this.urlMatrixSet = 'c';
+          this.cvaLayer = 'cia';
+          break;
+        case '3':
+          this.urlLayer = 'ter';
+          this.urlMatrixSet = 'c';
+          this.cvaLayer = 'cta';
+          break;
+      }
+      console.log(this.urlLayer);
     }
   }
 }
@@ -97,5 +132,32 @@ export default {
 #map {
   width: 100%;
   height: 100vh;
+  position: relative;
+
+  #thumbnail {
+    position: absolute;
+    z-index: 10;
+    left: 5vh;
+    bottom: 5vh;
+    opacity: 0.5;
+
+    ul {
+      padding: 0;
+      margin: 0;
+
+      li {
+        list-style-type: none;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        img {
+          width: 10vh;
+          height: 10vh;
+        }
+      }
+    }
+  }
 }
 </style>

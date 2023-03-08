@@ -1,12 +1,24 @@
 <template>
   <div id="map">
     <div id="thumbnail">
+      <div id="note">
+        <label><input type="checkbox" @change="noteCheck = !noteCheck" :checked="noteCheck"><span>隐藏注记层</span></label>
+      </div>
       <ul @click="showMap">
-        <li id="1"><img src="../image/vec_c.png" alt="矢量缩略图"></li>
-        <li id="2"><img src="../image/img_c.png" alt="影像缩略图"></li>
-        <li id="3"><img src="../image/ter_c.png" alt="地形缩略图"></li>
+        <li id="1">
+          <img src="../image/vec_c.png" alt="矢量缩略图">
+        </li>
+        <li id="2">
+          <img src="../image/img_c.png" alt="影像缩略图">
+        </li>
+        <li id="3">
+          
+          <img src="../image/ter_c.png" alt="地形缩略图">
+        </li>
       </ul>
+      
     </div>
+    
   </div>
 </template>
 <script>
@@ -29,7 +41,8 @@ export default {
 
       // 定义map所需参数
       projection: getProjection('EPSG:4326'),
-
+      // 是否隐藏注记
+      noteCheck: false
     }
   },
   computed:{
@@ -102,7 +115,19 @@ export default {
     }
 
   },
-
+  watch:{
+    // 监听input选择框，显示、隐藏注记
+    noteCheck(newVal){
+      switch(newVal){
+        case true:
+          this.hideNote(this.layer);
+          break;
+        case false: 
+          this.showNote(this.layer);
+          break;
+      }
+    }
+  },
   mounted() {
     this.createMap()
   },
@@ -164,8 +189,15 @@ export default {
       layers.forEach(el => {
         map.addLayer(el)
       })
+    },
+    // 显示注记图层
+    showNote(layers){
+      layers[layers.length - 1].setVisible(true)
+    },
+    // 隐藏注记图层
+    hideNote(layers){
+      layers[layers.length - 1].setVisible(false)
     }
-
   }
 }
 </script>
@@ -181,6 +213,25 @@ export default {
     left: 5vh;
     bottom: 5vh;
     
+    #note {
+      label {
+        // line-height: 1vh;
+        color: #ccc;
+        
+        &:hover {
+          color:#000;
+        }
+        
+        input {
+          height: 1.2vh;
+        }
+
+        span {
+          font-size: 1.5vh;
+        }
+      }
+    }
+
     ul {
       padding: 0;
       margin: 0;
@@ -200,5 +251,6 @@ export default {
       }
     }
   }
+
 }
 </style>

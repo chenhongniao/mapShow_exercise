@@ -2,7 +2,7 @@
   <div id="map">
     <div id="thumbnail">
       <div id="note">
-        <label><input type="checkbox" @change="noteCheck = !noteCheck" :checked="noteCheck"><span>隐藏注记层</span></label>
+        <label><input type="checkbox" @change="noteCheck = !noteCheck" :checked="noteCheck"><span>隐藏注记</span></label>
       </div>
       <ul @click="showMap">
         <li id="1">
@@ -22,11 +22,12 @@
   </div>
 </template>
 <script>
+import 'ol/ol.css'
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import { getWidth, getTopLeft } from 'ol/extent.js';
 import TileLayer from 'ol/layer/Tile.js';
-import { get as getProjection } from 'ol/proj.js';
+import { get as getProjection, transform } from 'ol/proj.js';
 import WMTS from 'ol/source/WMTS.js';
 import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
 
@@ -137,10 +138,9 @@ export default {
         layers: this.layer,
         target: 'map',
         view: new View({
-          center: [51158582, 4813697],
-          // extent: projectionExtent,
+          center: transform([106.55,29.57],"EPSG:4326","EPSG:3857"),
           minZoom: 3,
-          zoom: 3
+          zoom: 12,
         })
       });
     },

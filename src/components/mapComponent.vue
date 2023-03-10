@@ -12,13 +12,13 @@
           <img src="../image/img_c.png" alt="影像缩略图">
         </li>
         <li id="3">
-          
+
           <img src="../image/ter_c.png" alt="地形缩略图">
         </li>
       </ul>
-      
+
     </div>
-    
+
   </div>
 </template>
 <script>
@@ -46,20 +46,20 @@ export default {
       noteCheck: false
     }
   },
-  computed:{
+  computed: {
     // 投影范围
-    projectionExtent(){
+    projectionExtent() {
       return this.projection.getExtent();
     },
     // 天地图底图、注记请求url
-    urlMap(){
+    urlMap() {
       return 'http://t0.tianditu.gov.cn/' + this.urlLayer + '_' + this.urlMatrixSet + '/wmts?tk=37d614f39eb9dcfa72b2f1ab5aff22ff';
     },
-    urlCva(){
+    urlCva() {
       return 'http://t0.tianditu.gov.cn/' + this.cvaLayer + '_' + this.urlMatrixSet + '/wmts?tk=37d614f39eb9dcfa72b2f1ab5aff22ff';
     },
     // 计算分辨率数组和矩阵id数组
-    matrixArr(){
+    matrixArr() {
       let resolutions = new Array(19);
       let matrixIds = new Array(19);
       let size = getWidth(this.projectionExtent) / 256;
@@ -74,7 +74,7 @@ export default {
       }
     },
     // 获取成对的WMTS图层
-    layer(){
+    layer() {
       // 地图底图图层
       let mapLayer = new TileLayer({
         source: new WMTS({
@@ -112,18 +112,18 @@ export default {
         })
       });
 
-      return [mapLayer,cvaLayer]
+      return [mapLayer, cvaLayer]
     }
 
   },
-  watch:{
+  watch: {
     // 监听input选择框，显示、隐藏注记
-    noteCheck(newVal){
-      switch(newVal){
+    noteCheck(newVal) {
+      switch (newVal) {
         case true:
           this.hideNote(this.layer);
           break;
-        case false: 
+        case false:
           this.showNote(this.layer);
           break;
       }
@@ -138,8 +138,9 @@ export default {
         layers: this.layer,
         target: 'map',
         view: new View({
-          center: transform([106.55,29.57],"EPSG:4326","EPSG:3857"),
+          center: transform([106.55, 29.57], "EPSG:4326", "EPSG:3857"),
           minZoom: 3,
+          maxZoom: 19,
           zoom: 12,
         })
       });
@@ -149,53 +150,53 @@ export default {
       let li = e.target.parentNode;
       let lis = e.currentTarget.children;
       // 点击缩略图后的样式设置
-      for(let i = 0;i < lis.length; i++){
+      for (let i = 0; i < lis.length; i++) {
         lis[i].style = "opacity: 0.3"
       }
       li.style = "opacity:1";
 
       switch (li.id) {
         case '1':
-          this.removeLayer(this.map,this.layer);
+          this.removeLayer(this.map, this.layer);
           this.urlLayer = 'vec';
           this.urlMatrixSet = 'c';
           this.cvaLayer = 'cva';
-          this.addLayer(this.map,this.layer);
+          this.addLayer(this.map, this.layer);
           break;
         case '2':
-          this.removeLayer(this.map,this.layer);
+          this.removeLayer(this.map, this.layer);
           this.urlLayer = 'img';
           this.urlMatrixSet = 'c';
           this.cvaLayer = 'cia';
-          this.addLayer(this.map,this.layer);
+          this.addLayer(this.map, this.layer);
           break;
         case '3':
-          this.removeLayer(this.map,this.layer);
+          this.removeLayer(this.map, this.layer);
           this.urlLayer = 'ter';
           this.urlMatrixSet = 'c';
           this.cvaLayer = 'cta';
-          this.addLayer(this.map,this.layer);
+          this.addLayer(this.map, this.layer);
           break;
       }
     },
     // 移除图层
-    removeLayer(map,layers){
+    removeLayer(map, layers) {
       layers.forEach(el => {
         map.removeLayer(el)
       });
     },
     // 添加图层
-    addLayer(map,layers){
+    addLayer(map, layers) {
       layers.forEach(el => {
         map.addLayer(el)
       })
     },
     // 显示注记图层
-    showNote(layers){
+    showNote(layers) {
       layers[layers.length - 1].setVisible(true)
     },
     // 隐藏注记图层
-    hideNote(layers){
+    hideNote(layers) {
       layers[layers.length - 1].setVisible(false)
     }
   }
@@ -212,16 +213,16 @@ export default {
     z-index: 10;
     left: 5vh;
     bottom: 5vh;
-    
+
     #note {
       label {
         // line-height: 1vh;
         color: #ccc;
-        
+
         &:hover {
-          color:#000;
+          color: #000;
         }
-        
+
         input {
           height: 1.2vh;
         }
@@ -240,6 +241,7 @@ export default {
         list-style-type: none;
         cursor: pointer;
         opacity: 0.3;
+
         &:first-child {
           opacity: 1;
         }

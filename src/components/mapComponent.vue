@@ -12,16 +12,16 @@
           <img src="../image/img_c.png" alt="影像缩略图">
         </li>
         <li id="3">
-
           <img src="../image/ter_c.png" alt="地形缩略图">
         </li>
       </ul>
-
     </div>
 
+    <Search id="search"></Search>
   </div>
 </template>
 <script>
+// openlayers组件引入
 import 'ol/ol.css'
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
@@ -30,8 +30,18 @@ import TileLayer from 'ol/layer/Tile.js';
 import { get as getProjection, transform } from 'ol/proj.js';
 import WMTS from 'ol/source/WMTS.js';
 import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
+import { defaults, MousePosition } from 'ol/control';
+import { createStringXY } from 'ol/coordinate';
+
+// 额外组件引入
+import Search from '@/components/search.vue'
+
 
 export default {
+  components: {
+    Search
+  },
+
   data() {
     return {
       map: null,
@@ -138,12 +148,23 @@ export default {
         layers: this.layer,
         target: 'map',
         view: new View({
-          center: transform([106.55, 29.57], "EPSG:4326", "EPSG:3857"),
+          center: transform([106.55, 29.57], this.projection, "EPSG:3857"),
           minZoom: 3,
           maxZoom: 19,
           zoom: 12,
-        })
+        }),
+        controls: defaults({
+          attribution: true,
+          rotate: true,
+          zoom: false
+        }).extend([
+          new MousePosition({
+            projection: "EPSG:3857",
+            coordinateFormat: createStringXY(6)
+          })
+        ])
       });
+
     },
     // 点击缩略图切换图层显示
     showMap(e) {
@@ -208,6 +229,13 @@ export default {
   height: 100vh;
   position: relative;
 
+  /* 修改坐标拾取控件的样式 */
+  .ol-mouse-position {
+    top: initial;
+    bottom: 0px;
+    right: 200px;
+  }
+
   #thumbnail {
     position: absolute;
     z-index: 10;
@@ -254,5 +282,16 @@ export default {
     }
   }
 
+  #search {
+    position: absolute;
+    width: 30vh;
+    margin: 3vh 0 0 2vh;
+    z-index: 11;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }
 </style>

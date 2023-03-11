@@ -20,6 +20,11 @@ export default {
       input: '',
       mark: false
     }
+  },
+  watch:{
+    input(newVal) {
+      console.log(newVal);
+    }
   }
 }
 </script>

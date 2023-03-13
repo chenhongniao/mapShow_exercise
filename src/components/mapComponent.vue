@@ -17,7 +17,7 @@
       </ul>
     </div>
 
-    <Search id="search"></Search>
+    <Search id="search" :z="zoom" :center="geoCenter" :bound="geoBound" @computeSearch="computedForSearch()"></Search>
   </div>
 </template>
 <script>
@@ -27,7 +27,7 @@ import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import { getWidth, getTopLeft } from 'ol/extent.js';
 import TileLayer from 'ol/layer/Tile.js';
-import { get as getProjection, transform } from 'ol/proj.js';
+import { get as getProjection, toLonLat, fromLonLat } from 'ol/proj.js';
 import WMTS from 'ol/source/WMTS.js';
 import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
 import { defaults, MousePosition } from 'ol/control';
@@ -53,7 +53,12 @@ export default {
       // 定义map所需参数
       projection: getProjection('EPSG:4326'),
       // 是否隐藏注记
-      noteCheck: false
+      noteCheck: false,
+
+      // axios请求相关参数
+      zoom: 0,
+      geoCenter: null,
+      geoBound: null,
     }
   },
   computed: {
@@ -123,11 +128,14 @@ export default {
       });
 
       return [mapLayer, cvaLayer]
+    },
+    view() {
+      return this.map.getView()
     }
 
   },
   watch: {
-    // 监听input选择框，显示、隐藏注记
+    // 监听注记选择框的选中状态，显示、隐藏注记
     noteCheck(newVal) {
       switch (newVal) {
         case true:
@@ -148,7 +156,7 @@ export default {
         layers: this.layer,
         target: 'map',
         view: new View({
-          center: transform([106.55, 29.57], this.projection, "EPSG:3857"),
+          center: fromLonLat([106.55, 29.57]),
           minZoom: 3,
           maxZoom: 19,
           zoom: 12,
@@ -219,6 +227,24 @@ export default {
     // 隐藏注记图层
     hideNote(layers) {
       layers[layers.length - 1].setVisible(false)
+    },
+    // 计算Search中axios请求相关参数
+    computedForSearch() {
+      this.zoom = this.view.getZoom();
+      this.geoCenter = this.decimal(toLonLat(this.view.getCenter()));
+      let mapBound = null
+      mapBound = this.view.calculateExtent(this.map.getSize());
+      let min = mapBound === null ? null : [mapBound[0], mapBound[1]];
+      let max = mapBound === null ? null : [mapBound[2], mapBound[3]];
+      this.geoBound = this.decimal([...toLonLat(min), ...toLonLat(max)]);
+    },
+    // 处理坐标数组的小数位数
+    decimal(arr, num = 5) {
+      let newArr = [];
+      arr.forEach((v, i) => {
+        newArr[i] = parseFloat(v.toFixed(num))
+      })
+      return newArr
     }
   }
 }

@@ -17,8 +17,8 @@
       </ul>
     </div>
 
-    <Search id="search" :z="zoom" :center="geoCenter" :bound="geoBound" @computeSearch="computedForSearch()"
-      @getSearchData="mark"></Search>
+    <Search id="search" :z="zoom" :center="geoCenter" :bound="geoBound" :markControl="mark_flag"
+      @computeSearch="computedForSearch" @getSearchData="mark" @delButton="removeMark"></Search>
 
     <div ref="popup"></div>
   </div>
@@ -65,6 +65,11 @@ export default {
       zoom: 0,
       geoCenter: null,
       geoBound: null,
+      // 注记图层
+      vectorLayer: null,
+      // 控制删除注记按钮的显示与隐藏
+      mark_flag: false,
+
     }
   },
   computed: {
@@ -234,6 +239,7 @@ export default {
     hideNote(layers) {
       layers[layers.length - 1].setVisible(false)
     },
+
     // 计算Search中axios请求相关参数
     computedForSearch() {
       this.zoom = this.view.getZoom();
@@ -252,52 +258,55 @@ export default {
       })
       return newArr
     },
+
     // 图文标注
     mark(res_data) {
+      if (this.vectorLayer) this.map.removeLayer(this.vectorLayer);
       let iconFeature = [];
       let poisArr = res_data.pois
-      if (!poisArr || poisArr.length <= 0) return;
+      if (!poisArr || poisArr.length <= 0) {
+        alert("很抱歉，没有搜索到相关内容，请选择其他区域试试！")
+        return
+      };
       for (let i = 0; i < poisArr.length; i++) {
         // 提取坐标并转换为数字格式的数组
         let position = [];
         poisArr[i].lonlat.split(" ").forEach((v, j) => {
           position[j] = Number(v)
         });
+
         iconFeature[i] = new Feature({
           geometry: new Point(fromLonLat(position)),
           name: poisArr[i].name
         });
         iconFeature[i].setStyle(this.createLabelStyle(iconFeature[i]));
-        console.log(this.createLabelStyle(iconFeature[i]));
       };
       const vectorSource = new VecSource({
         features: iconFeature
       })
-      const vectorLayer = new VecLayer({
+      this.vectorLayer = new VecLayer({
         source: vectorSource
       })
-      console.log(vectorLayer);
-      this.map.addLayer(vectorLayer)
-
+      this.map.addLayer(this.vectorLayer)
+      this.mark_flag = true
     },
-
     // 设置标注样式
     createLabelStyle(feature) {
       return new Style({
         image: new Icon({
-            anchor: [0.5, 60],
-            anchorOrigin: 'top-right',
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'pixels',
-            offsetOrigin: 'top-right',
-            offset:[0,10],
-            //图标缩放比例
-            scale:0.5,
-            //透明度
-            opacity: 0.75,
-            //图标的url
-            src: require('@/image/icon.png')
-          }
+          anchor: [0.5, 60],
+          anchorOrigin: 'top-right',
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          offsetOrigin: 'top-right',
+          offset: [0, 10],
+          //图标缩放比例
+          scale: 0.5,
+          //透明度
+          opacity: 0.75,
+          //图标的url
+          src: require('@/image/icon.png')
+        }
         ),
         text: new Text({
           //位置
@@ -313,6 +322,12 @@ export default {
           stroke: new Stroke({ color: '#ffcc33', width: 2 })
         })
       });
+    },
+
+    // 移除注记图层
+    removeMark() {
+      this.map.removeLayer(this.vectorLayer);
+      this.mark_flag = false
     }
   }
 }
@@ -373,18 +388,6 @@ export default {
           height: 10vh;
         }
       }
-    }
-  }
-
-  #search {
-    position: absolute;
-    width: 30vh;
-    margin: 3vh 0 0 2vh;
-    z-index: 11;
-    opacity: 0.7;
-
-    &:hover {
-      opacity: 1;
     }
   }
 }

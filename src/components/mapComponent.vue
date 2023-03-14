@@ -17,7 +17,11 @@
       </ul>
     </div>
 
-    <Search id="search" :z="zoom" :center="geoCenter" :bound="geoBound" @computeSearch="computedForSearch()"></Search>
+    <Search id="search" 
+    :z="zoom" 
+    :center="geoCenter" 
+    :bound="geoBound" 
+    @computeSearch="computedForSearch()"></Search>
   </div>
 </template>
 <script>

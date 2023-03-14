@@ -6,10 +6,6 @@
         <el-button slot="append" @click="getParams">搜索</el-button>
       </el-input>
     </div>
-    <!-- 搜索结果标记 -->
-    <div v-if="mark">
-
-    </div>
   </div>
 </template>
 <script>
@@ -28,7 +24,7 @@ export default {
       // 天地图服务请求参数
       type: 'query',
       tk: '37d614f39eb9dcfa72b2f1ab5aff22ff',
-      postStr: '{"keyWord":"超市","level":"15","mapBound":"116.40466,39.90684,116.45016,39.93138","queryType":"3","pointLonlat":"116.42844,39.92314","queryRadius":"1000","count":"20","start":"0"}'
+      postStr: '{"keyWord":"超市","level":"15","mapBound":"116.40466,39.90684,116.45016,39.93138","queryType":"3","pointLonlat":"116.42844,39.92314","queryRadius":"1000","count":"20","start":"0"}',
 
     }
   },
@@ -42,10 +38,9 @@ export default {
     },
 
     async getParams() {
-      // 需要等待$emit()将事件执行完成后事件再像父组件取值，即子传父，父处理完成，再父传子。
+      // 需要等待$emit()将事件执行完成后事件再向父组件取值，即子传父，父处理完成，再父传子。
       await this.emitComputeSearch()
       this.computeStr()
-      console.log(this.postStr);
       this.initRequest()
     },
 
@@ -53,7 +48,6 @@ export default {
     computeStr() {
       this.postStr = `{"keyWord":"${this.input}","level":"${this.z}","mapBound":"${this.bound.join(',')}","queryType":"3","pointLonlat":"${this.center.join(',')}","queryRadius":"1000","count":"20","start":"0"}`
     },
-
 
     // 发起axios请求
     initRequest() {
@@ -63,13 +57,14 @@ export default {
           type: this.type,
           tk: this.tk
         }
-      }).then(function (res) {
+      }).then((res) => {
         // 处理成功情况
-        console.log(res.data);
+        // 将数据传递给map展示注记
+        this.$emit('getSearchData', res.data)
       })
-        .catch(function (err) {
+        .catch((err) => {
           // 处理错误情况
-          console.log(err);
+          alert(err);
         });
     }
   }

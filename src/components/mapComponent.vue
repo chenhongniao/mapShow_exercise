@@ -6,22 +6,21 @@
       </div>
       <ul @click="showMap">
         <li id="1">
-          <img src="../image/vec_c.png" alt="矢量缩略图">
+          <img src="@/image/vec_c.png" alt="矢量缩略图">
         </li>
         <li id="2">
-          <img src="../image/img_c.png" alt="影像缩略图">
+          <img src="@/image/img_c.png" alt="影像缩略图">
         </li>
         <li id="3">
-          <img src="../image/ter_c.png" alt="地形缩略图">
+          <img src="@/image/ter_c.png" alt="地形缩略图">
         </li>
       </ul>
     </div>
 
-    <Search id="search" 
-    :z="zoom" 
-    :center="geoCenter" 
-    :bound="geoBound" 
-    @computeSearch="computedForSearch()"></Search>
+    <Search id="search" :z="zoom" :center="geoCenter" :bound="geoBound" @computeSearch="computedForSearch()"
+      @getSearchData="mark"></Search>
+
+    <div ref="popup"></div>
   </div>
 </template>
 <script>
@@ -30,12 +29,15 @@ import 'ol/ol.css'
 import Map from 'ol/Map.js';
 import View from 'ol/View.js';
 import { getWidth, getTopLeft } from 'ol/extent.js';
-import TileLayer from 'ol/layer/Tile.js';
+import { Tile as TileLayer, Vector as VecLayer } from 'ol/layer';
 import { get as getProjection, toLonLat, fromLonLat } from 'ol/proj.js';
-import WMTS from 'ol/source/WMTS.js';
+import { WMTS, Vector as VecSource } from 'ol/source';
 import WMTSTileGrid from 'ol/tilegrid/WMTS.js';
 import { defaults, MousePosition } from 'ol/control';
 import { createStringXY } from 'ol/coordinate';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { Style, Icon, Text, Fill, Stroke } from 'ol/style';
 
 // 额外组件引入
 import Search from '@/components/search.vue'
@@ -243,12 +245,74 @@ export default {
       this.geoBound = this.decimal([...toLonLat(min), ...toLonLat(max)]);
     },
     // 处理坐标数组的小数位数
-    decimal(arr, num = 5) {
+    decimal(arr, num = 6) {
       let newArr = [];
       arr.forEach((v, i) => {
         newArr[i] = parseFloat(v.toFixed(num))
       })
       return newArr
+    },
+    // 图文标注
+    mark(res_data) {
+      let iconFeature = [];
+      let poisArr = res_data.pois
+      if (!poisArr || poisArr.length <= 0) return;
+      for (let i = 0; i < poisArr.length; i++) {
+        // 提取坐标并转换为数字格式的数组
+        let position = [];
+        poisArr[i].lonlat.split(" ").forEach((v, j) => {
+          position[j] = Number(v)
+        });
+        iconFeature[i] = new Feature({
+          geometry: new Point(fromLonLat(position)),
+          name: poisArr[i].name
+        });
+        iconFeature[i].setStyle(this.createLabelStyle(iconFeature[i]));
+        console.log(this.createLabelStyle(iconFeature[i]));
+      };
+      const vectorSource = new VecSource({
+        features: iconFeature
+      })
+      const vectorLayer = new VecLayer({
+        source: vectorSource
+      })
+      console.log(vectorLayer);
+      this.map.addLayer(vectorLayer)
+
+    },
+
+    // 设置标注样式
+    createLabelStyle(feature) {
+      return new Style({
+        image: new Icon({
+            anchor: [0.5, 60],
+            anchorOrigin: 'top-right',
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'pixels',
+            offsetOrigin: 'top-right',
+            offset:[0,10],
+            //图标缩放比例
+            scale:0.5,
+            //透明度
+            opacity: 0.75,
+            //图标的url
+            src: require('@/image/icon.png')
+          }
+        ),
+        text: new Text({
+          //位置
+          textAlign: 'center',
+          //基准线
+          textBaseline: 'middle',
+          //文字样式
+          font: 'normal 14px 微软雅黑',
+          //文本内容
+          text: feature.get('name'),
+          //文本填充样式（即文字颜色）
+          fill: new Fill({ color: '#aa3300' }),
+          stroke: new Stroke({ color: '#ffcc33', width: 2 })
+        })
+      });
     }
   }
 }

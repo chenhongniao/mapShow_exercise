@@ -58,6 +58,7 @@ export default {
 
       // 定义map所需参数
       projection: getProjection('EPSG:4326'),
+
       // 是否隐藏注记
       noteCheck: false,
 
@@ -170,7 +171,7 @@ export default {
           center: fromLonLat([106.55, 29.57]),
           minZoom: 3,
           maxZoom: 19,
-          zoom: 12,
+          zoom: 14,
         }),
         controls: defaults({
           attribution: true,
@@ -201,6 +202,7 @@ export default {
           this.urlLayer = 'vec';
           this.urlMatrixSet = 'c';
           this.cvaLayer = 'cva';
+          this.map.getView().setMaxZoom(19);
           this.addLayer(this.map, this.layer);
           break;
         case '2':
@@ -208,6 +210,7 @@ export default {
           this.urlLayer = 'img';
           this.urlMatrixSet = 'c';
           this.cvaLayer = 'cia';
+          this.map.getView().setMaxZoom(19);
           this.addLayer(this.map, this.layer);
           break;
         case '3':
@@ -215,6 +218,8 @@ export default {
           this.urlLayer = 'ter';
           this.urlMatrixSet = 'c';
           this.cvaLayer = 'cta';
+          // 地形图14级以下不显示，所以需要设置最大缩放等级
+          this.map.getView().setMaxZoom(14);
           this.addLayer(this.map, this.layer);
           break;
       }
@@ -306,8 +311,7 @@ export default {
           opacity: 0.75,
           //图标的url
           src: require('@/image/icon.png')
-        }
-        ),
+        }),
         text: new Text({
           //位置
           textAlign: 'center',

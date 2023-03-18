@@ -1,8 +1,6 @@
-# map_show
+# MapProjection
 
-使用openlayers开发地图时，使用vue，不能体现出vue的优势，相反，由于ol的封装，还使得开发变得复杂。
-
-留个坑，以后来填坑！
+项目不断完善中......
 
 ## Project setup
 ```

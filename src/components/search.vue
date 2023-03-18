@@ -2,7 +2,7 @@
   <div id="search">
     <!--  搜索框 -->
     <div id="searchBox">
-      <el-input placeholder="请输入地址" v-model.trim="input" class="input-with-select">
+      <el-input placeholder="请输入搜索内容,例如:超市" v-model.trim="input" class="input-with-select">
         <el-button slot="append" @click="getParams">搜索</el-button>
       </el-input>
     </div>
@@ -91,17 +91,21 @@ export default {
     &:hover {
       opacity: 1;
     }
-  }
+    .el-input::-webkit-input-placeholder {
+      font-size: 0.5vh;
+    }
 
-  >.el-button {
-    position: absolute;
-    left: 50vh;
-    top: 3.2vh;
-    z-index: 12;
-    opacity: 0.5;
 
-    &:hover {
-      opacity: 1;
+    >.el-button {
+      position: absolute;
+      left: 50vh;
+      top: 3.2vh;
+      z-index: 12;
+      opacity: 0.5;
+
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 }

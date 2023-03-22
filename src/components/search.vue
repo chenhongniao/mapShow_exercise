@@ -23,7 +23,7 @@ export default {
       // 天地图服务请求参数
       type: 'query',
       tk: '37d614f39eb9dcfa72b2f1ab5aff22ff',
-      postStr: '{"keyWord":"超市","level":"15","mapBound":"116.40466,39.90684,116.45016,39.93138","queryType":"3","pointLonlat":"116.42844,39.92314","queryRadius":"1000","count":"20","start":"0"}',
+      postStr: null,
 
     }
   },
@@ -91,22 +91,23 @@ export default {
     &:hover {
       opacity: 1;
     }
+
     .el-input::-webkit-input-placeholder {
       font-size: 0.5vh;
     }
+  }
 
+  >.el-button {
+    position: absolute;
+    right: 8vh;
+    top: 3.2vh;
+    z-index: 12;
+    opacity: 0.5;
 
-    >.el-button {
-      position: absolute;
-      left: 50vh;
-      top: 3.2vh;
-      z-index: 12;
-      opacity: 0.5;
-
-      &:hover {
-        opacity: 1;
-      }
+    &:hover {
+      opacity: 1;
     }
   }
+
 }
 </style>

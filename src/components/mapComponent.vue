@@ -19,8 +19,12 @@
 
     <Search id="search" :z="zoom" :center="geoCenter" :bound="geoBound" :markControl="mark_flag"
       @computeSearch="computedForSearch" @getSearchData="mark" @delButton="removeMark"></Search>
+    <!-- 网站备案信息 -->
+    <div id="footer">
+      <a href="https://beian.miit.gov.cn/" target="_blank">渝ICP备2023002712号-1</a>
+      <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;网站仅供学习交流使用</span>
+    </div>
 
-    <div ref="popup"></div>
   </div>
 </template>
 <script>
@@ -392,6 +396,22 @@ export default {
           height: 10vh;
         }
       }
+    }
+  }
+
+  #footer {
+    position: absolute;
+    left: 5px;
+    bottom: 5px;
+    z-index: 999;
+
+    a {
+      font-weight: bold;
+    }
+
+    span {
+      color: red;
+      opacity: 0.7;
     }
   }
 }
